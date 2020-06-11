@@ -1,17 +1,17 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: xwiki-mysql
+  name: mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: xwiki-mysql-app
+      app: mysql-app
   template:
     metadata:
       creationTimestamp: null
       labels:
-        app: xwiki-mysql-app
+        app: mysql-app
     spec:
       volumes:
         - name: mysql-vol
