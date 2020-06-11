@@ -20,7 +20,6 @@ spec:
         - name: mysql-init-vol
           configMap:
             name: mysql-init
-            defaultMode: 440
       containers:
         - resources: {}
           terminationMessagePath: /dev/termination-log
@@ -41,6 +40,11 @@ spec:
                 configMapKeyRef:
                   name: mysql-args
                   key: args-3
+            - name: MYSQL_ARG_4
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-args
+                  key: args-4
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
@@ -76,6 +80,7 @@ spec:
             - $(MYSQL_ARG_1)
             - $(MYSQL_ARG_2)
             - $(MYSQL_ARG_3)
+            - $(MYSQL_ARG_4)
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
