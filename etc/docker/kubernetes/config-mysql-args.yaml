@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: mysql-args
+data:
+  args-1: '--character-set-server=utf8mb4'
+  args-2: '--collation-server=utf8mb4_bin'
+  args-3: '--explicit-defaults-for-timestamp=1'
