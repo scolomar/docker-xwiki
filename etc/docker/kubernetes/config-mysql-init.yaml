@@ -1,6 +1,6 @@
-kind: ConfigMap
 apiVersion: v1
-metadata:
-  name: mysql-init
 data:
   init.sql: grant all privileges on *.* to xwiki@'%'
+kind: ConfigMap
+metadata:
+  name: mysql-init
