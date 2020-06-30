@@ -1,5 +1,5 @@
-kind: Deployment
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: mysql
 spec:
@@ -22,7 +22,11 @@ spec:
           name: mysql-init-vol
       containers:
         - 
-          name: mysql-db-instance
+          args:
+            - $(MYSQL_ARG_1)
+            - $(MYSQL_ARG_2)
+            - $(MYSQL_ARG_3)
+            - $(MYSQL_ARG_4)
           env:
             - 
               name: MYSQL_ARG_1
@@ -72,6 +76,8 @@ spec:
                 secretKeyRef:
                   name: mysql
                   key: MYSQL_USER
+          image: 'mysql:5.7'
+          name: mysql-db-instance
           ports:
             - 
               containerPort: 3306
@@ -83,9 +89,3 @@ spec:
             - 
               mountPath: /docker-entrypoint-initdb.d
               name: mysql-init-vol
-          image: 'mysql:5.7'
-          args:
-            - $(MYSQL_ARG_1)
-            - $(MYSQL_ARG_2)
-            - $(MYSQL_ARG_3)
-            - $(MYSQL_ARG_4)
