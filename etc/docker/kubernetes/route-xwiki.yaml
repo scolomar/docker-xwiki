@@ -7,7 +7,6 @@ spec:
   to:
     kind: Service
     name: xwiki-web
-    weight: 100
   port:
     targetPort: 8080
   tls:
