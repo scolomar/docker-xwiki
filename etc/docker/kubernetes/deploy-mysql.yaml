@@ -3,93 +3,89 @@ apiVersion: apps/v1
 metadata:
   name: mysql
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: mysql-app
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: mysql-app
     spec:
       volumes:
-        - name: mysql-vol
+        - 
+          name: mysql-vol
           persistentVolumeClaim:
             claimName: mysql
-        - name: mysql-init-vol
+        - 
           configMap:
             name: mysql-init
+          name: mysql-init-vol
       containers:
-        - resources: {}
-          terminationMessagePath: /dev/termination-log
+        - 
           name: mysql-db-instance
           env:
-            - name: MYSQL_ARG_1
+            - 
+              name: MYSQL_ARG_1
               valueFrom:
                 configMapKeyRef:
                   name: mysql-args
                   key: args-1
-            - name: MYSQL_ARG_2
+            - 
+              name: MYSQL_ARG_2
               valueFrom:
                 configMapKeyRef:
                   name: mysql-args
                   key: args-2
-            - name: MYSQL_ARG_3
+            - 
+              name: MYSQL_ARG_3
               valueFrom:
                 configMapKeyRef:
                   name: mysql-args
                   key: args-3
-            - name: MYSQL_ARG_4
+            - 
+              name: MYSQL_ARG_4
               valueFrom:
                 configMapKeyRef:
                   name: mysql-args
                   key: args-4
-            - name: MYSQL_DATABASE
+            - 
+              name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
                   name: mysql
                   key: MYSQL_DATABASE
-            - name: MYSQL_PASSWORD
+            - 
+              name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mysql
                   key: MYSQL_PASSWORD
-            - name: MYSQL_ROOT_PASSWORD
+            - 
+              name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mysql
                   key: MYSQL_ROOT_PASSWORD
-            - name: MYSQL_USER
+            - 
+              name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
                   name: mysql
                   key: MYSQL_USER
           ports:
-            - containerPort: 3306
+            - 
+              containerPort: 3306
               protocol: TCP
-          imagePullPolicy: IfNotPresent
           volumeMounts:
-            - name: mysql-vol
+            - 
               mountPath: /var/lib/mysql
-            - name: mysql-init-vol
+              name: mysql-vol
+            - 
               mountPath: /docker-entrypoint-initdb.d
-          terminationMessagePolicy: File
+              name: mysql-init-vol
           image: 'mysql:5.7'
           args:
             - $(MYSQL_ARG_1)
             - $(MYSQL_ARG_2)
             - $(MYSQL_ARG_3)
             - $(MYSQL_ARG_4)
-      restartPolicy: Always
-      terminationGracePeriodSeconds: 30
-      dnsPolicy: ClusterFirst
-      securityContext: {}
-      schedulerName: default-scheduler
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 25%
-      maxSurge: 25%
-  revisionHistoryLimit: 10
-  progressDeadlineSeconds: 600
