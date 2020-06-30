@@ -3,14 +3,17 @@ kind: NetworkPolicy
 metadata:
   name: mysql
 spec:
-  podSelector:
-    matchLabels:
-      app: mysql-app
   ingress:
-    - from:
-        - podSelector:
+    - 
+      from:
+        - 
+          podSelector:
             matchLabels:
               app: xwiki-app
       ports:
-        - protocol: TCP
+        - 
           port: 3306
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app: mysql-app
