@@ -32,50 +32,50 @@ spec:
               name: MYSQL_ARG_1
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-args
                   key: args-1
+                  name: mysql-args
             - 
               name: MYSQL_ARG_2
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-args
                   key: args-2
+                  name: mysql-args
             - 
               name: MYSQL_ARG_3
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-args
                   key: args-3
+                  name: mysql-args
             - 
               name: MYSQL_ARG_4
               valueFrom:
                 configMapKeyRef:
-                  name: mysql-args
                   key: args-4
+                  name: mysql-args
             - 
               name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: mysql
                   key: MYSQL_DATABASE
+                  name: mysql
             - 
               name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql
                   key: MYSQL_PASSWORD
+                  name: mysql
             - 
               name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql
                   key: MYSQL_ROOT_PASSWORD
+                  name: mysql
             - 
               name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: mysql
                   key: MYSQL_USER
+                  name: mysql
           image: 'mysql:5.7'
           name: mysql-db-instance
           ports:
