@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: xwiki
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: xwiki-app
@@ -24,26 +23,26 @@ spec:
               name: DB_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: xwiki
                   key: DB_DATABASE
+                  name: xwiki
             - 
               name: DB_HOST
               valueFrom:
                 secretKeyRef:
-                  name: xwiki
                   key: DB_HOST
+                  name: xwiki
             - 
               name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: xwiki
                   key: DB_PASSWORD
+                  name: xwiki
             - 
               name: DB_USER
               valueFrom:
                 secretKeyRef:
-                  name: xwiki
                   key: DB_USER
+                  name: xwiki
           image: 'xwiki:stable'
           name: xwiki-app-instance
           ports:
