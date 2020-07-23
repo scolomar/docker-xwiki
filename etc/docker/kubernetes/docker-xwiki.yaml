@@ -1,0 +1,267 @@
+apiVersion: v1
+data:
+  args-1: '--character-set-server=utf8mb4'
+  args-2: '--collation-server=utf8mb4_bin'
+  args-3: '--explicit-defaults-for-timestamp=1'
+  args-4: '--datadir=/var/lib/mysql/data'
+kind: ConfigMap
+metadata:
+  name: mysql-args
+---
+apiVersion: v1
+data:
+  init.sql: grant all privileges on *.* to xwiki@'%'
+kind: ConfigMap
+metadata:
+  name: mysql-init
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql-app
+  template:
+    metadata:
+      labels:
+        app: mysql-app
+    spec:
+      volumes:
+        - 
+          name: mysql-vol
+          persistentVolumeClaim:
+            claimName: mysql
+        - 
+          configMap:
+            name: mysql-init
+          name: mysql-init-vol
+      containers:
+        - 
+          args:
+            - $(MYSQL_ARG_1)
+            - $(MYSQL_ARG_2)
+            - $(MYSQL_ARG_3)
+            - $(MYSQL_ARG_4)
+          env:
+            - 
+              name: MYSQL_ARG_1
+              valueFrom:
+                configMapKeyRef:
+                  key: args-1
+                  name: mysql-args
+            - 
+              name: MYSQL_ARG_2
+              valueFrom:
+                configMapKeyRef:
+                  key: args-2
+                  name: mysql-args
+            - 
+              name: MYSQL_ARG_3
+              valueFrom:
+                configMapKeyRef:
+                  key: args-3
+                  name: mysql-args
+            - 
+              name: MYSQL_ARG_4
+              valueFrom:
+                configMapKeyRef:
+                  key: args-4
+                  name: mysql-args
+            - 
+              name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_DATABASE
+                  name: mysql
+            - 
+              name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_PASSWORD
+                  name: mysql
+            - 
+              name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: mysql
+            - 
+              name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_USER
+                  name: mysql
+          image: 'mysql:5.7'
+          name: mysql-db-instance
+          ports:
+            - 
+              containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - 
+              mountPath: /var/lib/mysql
+              name: mysql-vol
+            - 
+              mountPath: /docker-entrypoint-initdb.d
+              name: mysql-init-vol
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xwiki
+spec:
+  selector:
+    matchLabels:
+      app: xwiki-app
+  template:
+    metadata:
+      labels:
+        app: xwiki-app
+    spec:
+      volumes:
+        - 
+          name: xwiki-vol
+          persistentVolumeClaim:
+            claimName: xwiki
+      containers:
+        - 
+          env:
+            - 
+              name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: DB_DATABASE
+                  name: xwiki
+            - 
+              name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: DB_HOST
+                  name: xwiki
+            - 
+              name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: xwiki
+            - 
+              name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USER
+                  name: xwiki
+          image: 'xwiki:stable'
+          name: xwiki-app-instance
+          ports:
+            - 
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - 
+              mountPath: /usr/local/xwiki          
+              name: xwiki-vol
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql
+spec:
+  ingress:
+    - 
+      from:
+        - 
+          podSelector:
+            matchLabels:
+              app: xwiki-app
+      ports:
+        - 
+          port: 3306
+  podSelector:
+    matchLabels:
+      app: mysql-app
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: gp2
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: xwiki
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: gp2
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: web
+spec:
+  host: xwiki-x.apps.openshift.sebastian-colomar.es
+  to:
+    kind: Service
+    name: xwiki-web
+  port:
+    targetPort: 8080
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  wildcardPolicy: None
+---
+apiVersion: v1
+data:
+  MYSQL_DATABASE: eHdpa2k=
+  MYSQL_PASSWORD: eHdpa2k=
+  MYSQL_ROOT_PASSWORD: eHdpa2k=
+  MYSQL_USER: eHdpa2k=
+kind: Secret
+metadata:
+  name: mysql
+type: Opaque
+---
+apiVersion: v1
+data:
+  DB_DATABASE: eHdpa2k=
+  DB_HOST: bXlzcWwteHdpa2k=
+  DB_PASSWORD: eHdpa2k=
+  DB_USER: eHdpa2k=
+kind: Secret
+metadata:
+  name: xwiki
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-xwiki
+spec:
+  ports:
+    - 
+      port: 3306
+  selector:
+    app: mysql-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xwiki-web
+spec:
+  selector:
+    app: xwiki-app
+  ports:
+    - 
+      port: 8080
