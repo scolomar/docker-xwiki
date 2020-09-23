@@ -156,7 +156,7 @@ spec:
                 secretKeyRef:
                   key: DB_USER
                   name: xwiki-secret
-          image: secobau/docker-xwiki:latest
+          image: secobau/docker-xwiki:2.2
           name: xwiki-container
           ports:
             - 
