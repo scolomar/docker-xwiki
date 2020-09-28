@@ -124,11 +124,6 @@ spec:
       labels:
         app: xwiki
     spec:
-      volumes:
-        - 
-          name: xwiki-vol
-          persistentVolumeClaim:
-            claimName: xwiki-pvc
       containers:
         - 
           env:
@@ -166,6 +161,11 @@ spec:
             - 
               mountPath: /usr/local/xwiki          
               name: xwiki-vol
+      volumes:
+        - 
+          name: xwiki-vol
+          persistentVolumeClaim:
+            claimName: xwiki-pvc
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
