@@ -3,13 +3,6 @@
 #      SPDX-License-Identifier:  GPL-2.0-only                           #
 #########################################################################
 ---
-apiVersion: v1
-data:
-  init.sql: grant all privileges on *.* to xwiki@'%'
-kind: ConfigMap
-metadata:
-  name: mysql-init-cm
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
