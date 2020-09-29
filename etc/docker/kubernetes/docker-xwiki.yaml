@@ -1,0 +1,257 @@
+#########################################################################
+#      Copyright (C) 2020        Sebastian Francisco Colomar Bauza      #
+#      SPDX-License-Identifier:  GPL-2.0-only                           #
+#########################################################################
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-deploy
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - 
+          args:
+            - $(MYSQL_ARG_1)
+            - $(MYSQL_ARG_2)
+            - $(MYSQL_ARG_3)
+            - $(MYSQL_ARG_4)
+          env:
+            - 
+              name: MYSQL_ARG_1
+              valueFrom:
+                configMapKeyRef:
+                  key: args-1
+                  name: mysql.args
+            - 
+              name: MYSQL_ARG_2
+              valueFrom:
+                configMapKeyRef:
+                  key: args-2
+                  name: mysql.args
+            - 
+              name: MYSQL_ARG_3
+              valueFrom:
+                configMapKeyRef:
+                  key: args-3
+                  name: mysql.args
+            - 
+              name: MYSQL_ARG_4
+              valueFrom:
+                configMapKeyRef:
+                  key: args-4
+                  name: mysql.args
+            - 
+              name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_DATABASE
+                  name: mysql.passwd
+            - 
+              name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_PASSWORD
+                  name: mysql.passwd
+            - 
+              name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: mysql.passwd
+            - 
+              name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_USER
+                  name: mysql.passwd
+          image: 'mysql:5.7'
+          name: mysql-container
+          ports:
+            - 
+              containerPort: 3306
+          volumeMounts:
+            - 
+              mountPath: /var/lib/mysql
+              name: mysql-vol
+            - 
+              mountPath: /docker-entrypoint-initdb.d
+              name: mysql-init-vol
+      volumes:
+        - 
+          name: mysql-vol
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - 
+          configMap:
+            name: mysql-init.sql
+          name: mysql-init-vol
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xwiki-deploy
+spec:
+  selector:
+    matchLabels:
+      app: xwiki
+  template:
+    metadata:
+      labels:
+        app: xwiki
+    spec:
+      containers:
+        - 
+          env:
+            - 
+              name: DB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: DB_DATABASE
+                  name: xwiki.passwd
+            - 
+              name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: DB_HOST
+                  name: xwiki.passwd
+            - 
+              name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: xwiki.passwd
+            - 
+              name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USER
+                  name: xwiki.passwd
+          image: secobau/docker-xwiki:latest
+          name: xwiki-container
+          ports:
+            - 
+              containerPort: 8080
+          volumeMounts:
+            - 
+              mountPath: /usr/local/xwiki          
+              name: xwiki-vol
+      volumes:
+        - 
+          name: xwiki-vol
+          persistentVolumeClaim:
+            claimName: xwiki-pvc
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql-netpol
+spec:
+  ingress:
+    - 
+      from:
+        - 
+          podSelector:
+            matchLabels:
+              app: xwiki
+      ports:
+        - 
+          port: 3306
+  podSelector:
+    matchLabels:
+      app: mysql
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: xwiki-netpol
+spec:
+  ingress:
+    - 
+      ports:
+        - 
+          port: 8080
+  podSelector:
+    matchLabels:
+      app: xwiki
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: "/mnt/mysql"
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: xwiki-pv
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: "/mnt/xwiki"
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: xwiki-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-svc
+spec:
+  ports:
+    - 
+      port: 3306
+  selector:
+    app: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xwiki-svc
+spec:
+  ports:
+    - 
+      nodePort: 30001
+      port: 8080
+  selector:
+    app: xwiki
+  type: nodePort
