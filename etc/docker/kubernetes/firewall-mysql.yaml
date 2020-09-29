@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: mysql
+spec:
+  ingress:
+    - 
+      from:
+        - 
+          podSelector:
+            matchLabels:
+              app: xwiki-app
+      ports:
+        - 
+          port: 3306
+  podSelector:
+    matchLabels:
+      app: mysql-app
