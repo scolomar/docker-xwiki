@@ -2,15 +2,6 @@
 #      Copyright (C) 2020        Sebastian Francisco Colomar Bauza      #
 #      SPDX-License-Identifier:  GPL-2.0-only                           #
 #########################################################################
-apiVersion: v1
-data:
-  args-1: '--character-set-server=utf8mb4'
-  args-2: '--collation-server=utf8mb4_bin'
-  args-3: '--explicit-defaults-for-timestamp=1'
-  args-4: '--datadir=/var/lib/mysql/data'
-kind: ConfigMap
-metadata:
-  name: mysql-args-cm
 ---
 apiVersion: v1
 data:
@@ -32,15 +23,6 @@ spec:
       labels:
         app: mysql
     spec:
-      volumes:
-        - 
-          name: mysql-vol
-          persistentVolumeClaim:
-            claimName: mysql-pvc
-        - 
-          configMap:
-            name: mysql-init-cm
-          name: mysql-init-vol
       containers:
         - 
           args:
@@ -54,55 +36,54 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: args-1
-                  name: mysql-args-cm
+                  name: mysql.args
             - 
               name: MYSQL_ARG_2
               valueFrom:
                 configMapKeyRef:
                   key: args-2
-                  name: mysql-args-cm
+                  name: mysql.args
             - 
               name: MYSQL_ARG_3
               valueFrom:
                 configMapKeyRef:
                   key: args-3
-                  name: mysql-args-cm
+                  name: mysql.args
             - 
               name: MYSQL_ARG_4
               valueFrom:
                 configMapKeyRef:
                   key: args-4
-                  name: mysql-args-cm
+                  name: mysql.args
             - 
               name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_DATABASE
-                  name: mysql-secret
+                  name: mysql.passwd
             - 
               name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_PASSWORD
-                  name: mysql-secret
+                  name: mysql.passwd
             - 
               name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_ROOT_PASSWORD
-                  name: mysql-secret
+                  name: mysql.passwd
             - 
               name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
                   key: MYSQL_USER
-                  name: mysql-secret
+                  name: mysql.passwd
           image: 'mysql:5.7'
           name: mysql-container
           ports:
             - 
               containerPort: 3306
-              protocol: TCP
           volumeMounts:
             - 
               mountPath: /var/lib/mysql
@@ -110,6 +91,15 @@ spec:
             - 
               mountPath: /docker-entrypoint-initdb.d
               name: mysql-init-vol
+      volumes:
+        - 
+          name: mysql-vol
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+        - 
+          configMap:
+            name: mysql-init.sql
+          name: mysql-init-vol
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -132,31 +122,30 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: DB_DATABASE
-                  name: xwiki-secret
+                  name: xwiki.passwd
             - 
               name: DB_HOST
               valueFrom:
                 secretKeyRef:
                   key: DB_HOST
-                  name: xwiki-secret
+                  name: xwiki.passwd
             - 
               name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: DB_PASSWORD
-                  name: xwiki-secret
+                  name: xwiki.passwd
             - 
               name: DB_USER
               valueFrom:
                 secretKeyRef:
                   key: DB_USER
-                  name: xwiki-secret
+                  name: xwiki.passwd
           image: secobau/docker-xwiki:latest
           name: xwiki-container
           ports:
             - 
               containerPort: 8080
-              protocol: TCP
           volumeMounts:
             - 
               mountPath: /usr/local/xwiki          
@@ -237,28 +226,6 @@ spec:
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: edge
----
-apiVersion: v1
-stringData:
-  MYSQL_DATABASE: xwiki
-  MYSQL_PASSWORD: xwiki
-  MYSQL_ROOT_PASSWORD: xwiki
-  MYSQL_USER: xwiki
-kind: Secret
-metadata:
-  name: mysql-secret
-type: Opaque
----
-apiVersion: v1
-stringData:
-  DB_DATABASE: xwiki
-  DB_HOST: mysql-svc
-  DB_PASSWORD: xwiki
-  DB_USER: xwiki
-kind: Secret
-metadata:
-  name: xwiki-secret
-type: Opaque
 ---
 apiVersion: v1
 kind: Service
