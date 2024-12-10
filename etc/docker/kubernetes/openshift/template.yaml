@@ -221,7 +221,7 @@ objects:
     resources:
       requests:
         storage: 1Gi
-    storageClassName: gp2
+    storageClassName: gp3-csi
 -
   apiVersion: v1
   kind: PersistentVolumeClaim
@@ -233,7 +233,7 @@ objects:
     resources:
       requests:
         storage: 1Gi
-    storageClassName: gp2
+    storageClassName: gp3-csi
 -
   apiVersion: route.openshift.io/v1
   kind: Route
@@ -250,22 +250,22 @@ objects:
       termination: edge
 -
   apiVersion: v1
-  data:
-    MYSQL_DATABASE: eHdpa2k=
-    MYSQL_PASSWORD: eHdpa2k=
-    MYSQL_ROOT_PASSWORD: eHdpa2k=
-    MYSQL_USER: eHdpa2k=
+  stringData:
+    MYSQL_DATABASE: xwiki
+    MYSQL_PASSWORD: xwiki
+    MYSQL_ROOT_PASSWORD: xwiki
+    MYSQL_USER: xwiki
   kind: Secret
   metadata:
     name: mysql-secret
   type: Opaque
 -
   apiVersion: v1
-  data:
-    DB_DATABASE: eHdpa2k=
-    DB_HOST: bXlzcWwteHdpa2k=
-    DB_PASSWORD: eHdpa2k=
-    DB_USER: eHdpa2k=
+  stringData:
+    DB_DATABASE: xwiki
+    DB_HOST: mysql-svc
+    DB_PASSWORD: xwiki
+    DB_USER: xwiki
   kind: Secret
   metadata:
     name: xwiki-secret
