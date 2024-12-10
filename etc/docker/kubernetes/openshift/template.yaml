@@ -101,18 +101,18 @@ objects:
               secretKeyRef:
                 key: MYSQL_USER
                 name: mysql.passwd
-            image: 'mysql:5.7'
-            name: mysql-container
-            ports:
-            - 
-              containerPort: 3306
-            volumeMounts:
-            - 
-              mountPath: /var/lib/mysql
-              name: mysql-vol
-            - 
-              mountPath: /docker-entrypoint-initdb.d
-              name: mysql-init-vol
+          image: 'mysql:5.7'
+          name: mysql-container
+          ports:
+          - 
+            containerPort: 3306
+          volumeMounts:
+          - 
+            mountPath: /var/lib/mysql
+            name: mysql-vol
+          - 
+            mountPath: /docker-entrypoint-initdb.d
+            name: mysql-init-vol
         volumes:
         - 
           name: mysql-vol
