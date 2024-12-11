@@ -290,9 +290,9 @@ parameters:
   displayName: PVC_SIZE_APP
   name: PVC_SIZE_APP
   required: true
-  value: 1g
+  value: 1G
 - description: PV size for DB
   displayName: PVC_SIZE_DB
   name: PVC_SIZE_DB
   required: true
-  value: 1g
+  value: 1G
