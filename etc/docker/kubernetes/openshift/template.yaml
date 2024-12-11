@@ -92,7 +92,7 @@ objects:
           image: ${IMAGE_DB}
           name: ${NAME_DB}
           ports:
-          - containerPort: ${PORT_DB}
+          - containerPort: 3306
           volumeMounts:
           - mountPath: /var/lib/mysql
             name: ${NAME_DB}
@@ -143,7 +143,7 @@ objects:
           image: secobau/docker-xwiki:latest
           name: ${NAME_APP}
           ports:
-          - containerPort: ${PORT_APP}
+          - containerPort: 8080
           volumeMounts:
           - mountPath: /usr/local/xwiki          
             name: ${NAME_APP}
@@ -162,7 +162,7 @@ objects:
           matchLabels:
             app: ${NAME_APP}
       ports:
-      - port: ${PORT_DB}
+      - port: 3306
     podSelector:
       matchLabels:
         app: ${NAME_DB}
@@ -173,7 +173,7 @@ objects:
   spec:
     ingress:
     - ports:
-      - port: ${PORT_APP}
+      - port: 8080
     podSelector:
       matchLabels:
         app: ${NAME_APP}
@@ -208,7 +208,7 @@ objects:
       kind: Service
       name: ${NAME_APP}
     port:
-      targetPort: ${PORT_APP}
+      targetPort: 8080
     tls:
       insecureEdgeTerminationPolicy: Redirect
       termination: edge
@@ -238,7 +238,7 @@ objects:
     name: ${NAME_DB}
   spec:
     ports:
-    - port: ${PORT_DB}
+    - port: 3306
     selector:
       app: ${NAME_DB}
 - apiVersion: v1
@@ -249,7 +249,7 @@ objects:
     selector:
       app: ${NAME_APP}
     ports:
-    - port: ${PORT_APP}
+    - port: 8080
 parameters:
 - description: Name of the app deployment (app=xwiki)
   displayName: NAME_APP
@@ -266,16 +266,6 @@ parameters:
   name: IMAGE_DB
   required: true
   value: mysql:5.7
-- description: Port of the app service
-  displayName: PORT_APP
-  name: PORT_APP
-  required: true
-  value: '8080'
-- description: Port of the db service
-  displayName: PORT_DB
-  name: PORT_DB
-  required: true
-  value: '3306'
 - description: DB user
   displayName: DB_USER
   name: DB_USER
