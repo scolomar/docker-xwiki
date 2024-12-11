@@ -270,12 +270,12 @@ parameters:
   displayName: PORT_APP
   name: PORT_APP
   required: true
-  value: 8080
+  value: '8080'
 - description: Port of the db service
   displayName: PORT_DB
   name: PORT_DB
   required: true
-  value: 3306
+  value: '3306'
 - description: DB user
   displayName: DB_USER
   name: DB_USER
